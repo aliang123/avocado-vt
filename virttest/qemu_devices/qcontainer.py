@@ -1288,8 +1288,9 @@ class DevContainer(object):
                 bus += ".%d" % unit
             # If bus was not set, don't set it, unless the device is
             # a spapr-vscsi device.
-            elif _bus is None and 'spapr_vscsi' not in _hba:
-                bus = None
+            elif _bus is None:
+                if ('virtio-scsi-pci' and 'spapr_vscsi') not in _hba:
+                    bus = None
             return devices, bus, {'type': qtype, 'atype': atype}
 
         #
@@ -1511,6 +1512,8 @@ class DevContainer(object):
             devices[-1].set_param('removable', removable, bool)
             if strict_mode:
                 devices[-1].set_param('channel', 0)
+            if bus:
+                devices[-1].set_param('bus', bus)
         elif fmt == 'virtio':
             devices[-1].set_param('driver', 'virtio-blk-pci')
             devices[-1].set_param("scsi", scsi, bool)
